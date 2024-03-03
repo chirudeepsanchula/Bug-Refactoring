@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Note.io</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f0f8ff; 
+    }
+    .container {
+      margin-top: 50px; 
+    }
+    .form-group {
+      width: 50%; 
+    }
+    .card {
+      border-radius: 10px; 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+      transition: transform 0.3s; 
+    }
+
+    .card:hover {
+      transform: scale(1.05); 
+    }
+
+    .card-header {
+      background-color: #e2e8f0; 
+      font-weight: bold;
+    }
+
+    .card-footer {
+      background-color: #e2e8f0; 
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .card-text {
+      margin: 0;
+    }
+
+    h1 {
+      font-family: 'Roboto', sans-serif; 
+      font-size: 36px;
+      color: #4a5568; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">Note.io</h1>
+    <form action="/" method="POST" class="form-inline justify-content-center">
+      <div class="form-group">
+        <input type="text" name="note" placeholder="Enter a note" class="form-control mr-2">
+      </div>
+      <button class="btn btn-primary"><i class="fas fa-plus"></i> Add Note</button> 
+    </form>
+    <ul class="list-group mt-4">
+    {% for note in notes %}
+      <li class="list-group-item">
+        <div class="card">
+          <div class="card-header">
+            Note {{ loop.index }}
+          </div>
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <p class="card-text">{{ note }}</p>
+            <form action="/delete/{{ loop.index0 }}" method="POST" style="display: inline">  
+              <button class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+            </form> 
+          </div>
+        </div>
+      </li> 
+    {% endfor %}
+    </ul> 
+  </div>
+  <script>
+    let deleteButtons = document.querySelectorAll(".btn-danger");
+
+    deleteButtons.forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        event.preventDefault(); 
+        let note = event.target.closest(".card"); 
+        let id = event.target.form.action.split("/").pop(); 
+        note.style.opacity = 0; 
+        setTimeout(function() {
+          note.remove(); 
+          let xhr = new XMLHttpRequest();
+          xhr.open("POST", "/delete/" + id);
+          xhr.send();
+         
+          let message = document.createElement("div");
+          message.className = "alert alert-success";
+          message.textContent = "Note deleted successfully!";
+          document.body.appendChild(message);
+          setTimeout(function() { 
+            message.remove(); 
+          }, 2000);
+        }, 500);
+      });
+    });
+  </script>
+</body> 
+</html> 
